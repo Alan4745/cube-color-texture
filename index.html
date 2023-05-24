@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Ejemplo de Textura en Three.js con Controles y Selector de Colores</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        #colorPicker {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.css" />
+</head>
+
+<body>
+    <div id="canvas-container">
+        <input type="text" id="colorPicker" />
+
+        <script type="module">
+            import * as THREE from 'https://cdn.skypack.dev/three@0.134.0/build/three.module.js';
+            import { OrbitControls } from 'https://cdn.skypack.dev/three@0.134.0/examples/jsm/controls/OrbitControls.js';
+
+            var scene = new THREE.Scene();
+            var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            var renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            var geometry = new THREE.BoxGeometry(2, 2, 2);
+            var geometry1 = new THREE.BoxGeometry(1, 1, 1);
+
+
+            var textureLoader = new THREE.TextureLoader();
+            var texture = textureLoader.load('./assets/bark_willow_02_disp_4k.png');
+            var texture1 = textureLoader.load('./assets/madera1.jpg');
+
+
+            var material = new THREE.MeshBasicMaterial({ map: texture });
+            var material1 = new THREE.MeshBasicMaterial({ map: texture1 });
+
+
+            var cube1 = new THREE.Mesh(geometry, material);
+            cube1.position.x = -2;
+            scene.add(cube1);
+
+            var cube2 = new THREE.Mesh(geometry1, material1);
+            cube2.position.x = 2;
+            scene.add(cube2);
+
+            camera.position.z = 5;
+
+            var controls = new OrbitControls(camera, renderer.domElement);
+            controls.minDistance = 2;
+            controls.maxDistance = 10;
+
+            const colorPickerInput = document.getElementById('colorPicker');
+            $(colorPickerInput).spectrum({
+                color: "#ff0000",
+                preferredFormat: "hex",
+                showInput: true,
+                showPalette: true,
+                palette: [
+                    ["#ff0000", "#00ff00", "#0000ff"],
+                    ["#ffff00", "#ff00ff", "#00ffff"]
+                ],
+                change: function (color) {
+                    cube1.material.color.setStyle(color.toHexString());
+                    cube2.material.color.setStyle(color.toHexString());
+                }
+            });
+
+            function onWindowResize() {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+
+            window.addEventListener('resize', onWindowResize, false);
+
+            function render() {
+                requestAnimationFrame(render);
+                renderer.render(scene, camera);
+            }
+
+            render();
+        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.js"></script>
+    </div>
+</body>
+
+</html>
